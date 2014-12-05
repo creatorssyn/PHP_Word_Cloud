@@ -20,6 +20,7 @@ class FrequencyTable {
   const WORDS_VERTICAL = 10;
 
   private $table = array();
+  // TODO: exapnd rejected words
   private $rejected_words = array(
     'and', 'our', 'your', 'their', 'his', 'her', 'the', 'you', 'them', 'yours',
     'with', 'such', 'even');
@@ -59,6 +60,11 @@ class FrequencyTable {
 
       $this->max_font_size = $val;
   }
+  
+  public function get_padding_size()
+  {
+    return $this->padding_size;
+  }
 
   public function add_word($word, $nbr_occurence = 1,$title=null) {
     $this->insert_word($word, $nbr_occurence,$title);
@@ -72,7 +78,8 @@ class FrequencyTable {
     return $this->table;
   }
   
-   private function insert_word($word, $count = 1,$title=null,$reject=false,$cleanup=false) {
+  // TODO: fix rejected words check
+   public function insert_word($word, $count = 1,$title=null,$reject=false,$cleanup=false) {
       // Reject unwanted words
       $word = strtolower($word);
       if (($reject) && ( (strlen($word) < 3) || (in_array($word, $this->rejected_words))) )  {
@@ -144,6 +151,7 @@ class FrequencyTable {
    * @param string $word The word to clenup
    * @return string The cleaned up word
    */
+   // TODO: this doesn't work
   private function cleanup_word($word) {
 
     $tmp = $word;
@@ -164,6 +172,16 @@ class FrequencyTable {
       }
     }
     return $tmp;
+  }
+  
+  public function set_words_limit($limit)
+  {
+    $this->words_limit = $limit;
+  }
+  
+  public function set_vertical_freq($freq)
+  {
+    $this->vertical_freq = $freq;
   }
 
 }

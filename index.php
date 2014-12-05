@@ -1,26 +1,22 @@
 <?php
 
-require dirname(__FILE__).'/tagcloud.php';
-
-$full_text = <<<EOT
-dreamcraft.ch is a developement company based in Switzerland, aimed to create, integrate and mantain cutting-edge technology web applications.
-We provide you our expertise in PHP/MySQL, Microsoft .NET and various Content Management Systems in order to develop new web applications or maintain and upgrade your current web sites.
-Our philosophy:
-Establish a durable and trustworthy win-win relation with our customers.
-Use quality Open Source Software whenever possible.
-Enforce good programming rules and standards to create better rich content web 2.0 applications.
-A folk wisdom says "united we stand, divided we fall". As such we work closely with other Swiss companies to offer you an even larger range of skills.
-Aicom are the creators of interactive web based tools such as FormFish, MettingPuzzle or MailJuggler.
-oriented.net is a high-quality web hosting company based in Switzerland. Our partnership with them allows us to offer advanced hosting solutions to your web application.
-EOT;
+require dirname(__FILE__).'/word_cloud.php';
 
 $font = dirname(__FILE__).'/Arial.ttf';
 $width = 600;
 $height = 600;
-$cloud = new WordCloud($width, $height, $font, $full_text);
-$palette = Palette::get_palette_from_hex($cloud->get_image(), array('FFA700', 'FFDF00', 'FF4F00', 'FFEE73'));
-$cloud->render($palette);
+$full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 
+$cloud = new WordCloud($width, $height, $font);
+$cloud->parse_text($full_text);
+$cloud->set_palette(Palette::get_random_palette());
+$cloud->set_text_size(10, 60);
+$cloud->set_word_limit(45);
+$cloud->set_vertical_frequency(FrequencyTable::WORDS_MAINLY_HORIZONTAL);
+$cloud->render();
+$cloud->output();
+
+/*
 // Render the cloud in a temporary file, and return its base64-encoded content
 $file = tempnam(getcwd(), 'img');
 imagepng($cloud->get_image(), $file);

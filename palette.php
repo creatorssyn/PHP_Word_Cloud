@@ -28,6 +28,7 @@ class Palette {
    * @param object $im The GD image
    * @param integer $count The number of colors in the palette
    */
+   // TODO: this doesn't work, all black.
   public static function get_random_palette($im, $count = 5) {
     $palette = array();
     for ($i = 0; $i < $count; $i++) {
