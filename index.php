@@ -1,4 +1,6 @@
 <?php
+ini_set('show_errors', 1);
+error_reporting(E_ALL);
 
 require dirname(__FILE__).'/word_cloud.php';
 
@@ -9,7 +11,7 @@ $full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 
 $cloud = new WordCloud($width, $height, $font);
 $cloud->parse_text($full_text);
-$cloud->set_palette(Palette::get_random_palette());
+$cloud->set_palette(Palette::get_random_palette($cloud->get_image()));
 $cloud->set_text_size(10, 60);
 $cloud->set_word_limit(45);
 $cloud->set_vertical_frequency(FrequencyTable::WORDS_MAINLY_HORIZONTAL);
