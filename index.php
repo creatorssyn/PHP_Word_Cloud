@@ -10,10 +10,10 @@ $height = 600;
 $full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 
 $cloud = new WordCloud($width, $height, $font);
-$cloud->parse_text($full_text);
+$cloud->parse_text($full_text, TRUE, TRUE);
 $cloud->set_palette(Palette::get_random_palette($cloud->get_image()));
 $cloud->set_text_size(10, 60);
-$cloud->set_word_limit(45);
+$cloud->set_word_limit(75);
 $cloud->set_vertical_frequency(FrequencyTable::WORDS_MAINLY_HORIZONTAL);
 $cloud->render();
 $cloud->output();

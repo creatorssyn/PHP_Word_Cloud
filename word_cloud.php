@@ -44,7 +44,7 @@ class WordCloud
         $this->imagecolor = array($r, $g, $b, $a);
     }
     
-    public function parse_text($text)
+    public function parse_text($text, $reject=FALSE, $cleanup=FALSE)
     {
         if($this->table !== NULL)
         {
@@ -52,7 +52,7 @@ class WordCloud
             
             foreach($words as $word)
             {
-                $this->table->insert_word($word);
+                $this->table->insert_word($word, 1, NULL, $reject, $cleanup);
             }
             
             return count($words);
@@ -64,10 +64,10 @@ class WordCloud
     public function set_text_size($min=NULL, $max=NULL)
     {
         if($min !== NULL && $this->table !== NULL)
-            $this->table->setMinFontSize($min);
+            $this->table->set_min_font_size($min);
         
         if($max !== NULL && $this->table !== NULL)
-            $this->table->setMaxFontSize($max);
+            $this->table->set_max_font_size($max);
     }
     
     public function set_word_limit($limit)
@@ -125,10 +125,10 @@ class WordCloud
                 'box' => isset($boxes[$key]) ? $boxes[$key] : '',
             );
             
-            $pad = round((($val->size * $this->table->get_padding_size()) - $val->size)/2);
+            //$pad = round((($val->size * $this->table->get_padding_size()) - $val->size)/2);
             //var_dump($pad);
             
-            imagettftext($this->image, $val->size, $val->angle, $cx+$pad, $cy+$pad, $this->palette[$i % count($this->palette)], $this->font, $key);
+            imagettftext($this->image, $val->size, $val->angle, $cx, $cy, $this->palette[$i % count($this->palette)], $this->font, $key);
             $this->mask->add(new Box($cx, $cy, $val->box));
             $i++;
         }
