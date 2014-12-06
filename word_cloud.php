@@ -33,6 +33,11 @@ class WordCloud
         $this->table = new FrequencyTable($font);
         $this->image = imagecreatetruecolor($width, $height);
     }
+    
+    public function __destruct()
+    {
+        imagedestroy($this->get_image());
+    }
 
     public function get_image() 
     {
@@ -167,6 +172,7 @@ class WordCloud
     {
         $words = $this->table->get_table();
         $boxes = $this->mask->get_table();
+        
         if (count($boxes) != count($words)) 
         {
             throw new Exception('Error: mask count <> word count');
@@ -174,8 +180,9 @@ class WordCloud
 
         $map = array();
         $i = 0;
-        foreach($words as $key => $val) {
-            $map[] = array($key, $boxes[$i],$val->title);
+        foreach($words as $key => $val) 
+        {
+            $map[] = array($key, $boxes[$i], $val->title);
             $i += 1;
         }
 
