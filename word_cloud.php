@@ -15,6 +15,8 @@ require dirname(__FILE__).'/palette.php';
  
 class WordCloud 
 {
+    const RENDER_LIMIT = 3;
+    
     private $width, $height;
     private $font;
     private $mask;
@@ -22,6 +24,8 @@ class WordCloud
     private $image;
     private $imagecolor;
     private $palette;
+    private $allow_resize = FALSE;
+    private $redner_count = 0;
 
     public function __construct($width, $height, $font)
     {
@@ -47,6 +51,11 @@ class WordCloud
     public function set_image_color($r, $g, $b, $a)
     {
         $this->imagecolor = array($r, $g, $b, $a);
+    }
+    
+    public function allow_resize($val=TRUE)
+    {
+        $this->allow_resize = $val;
     }
     
     public function parse_text($text, $reject=FALSE, $cleanup=FALSE)
@@ -92,6 +101,8 @@ class WordCloud
 
     public function render()
     {
+        $this->render_count++;
+    
         //Set the flag to save full alpha channel information (as opposed to single-color transparency) when saving PNG images
         imagealphablending($this->image, FALSE);
         imagesavealpha($this->image, true);
@@ -137,34 +148,48 @@ class WordCloud
             $this->mask->add(new Box($cx, $cy, $val->box));
             $i++;
         }
-
-        // TODO: Black bounding box happens here, when the "cropped" image is LARGER than the original because we've shoved too many words in it
-        // needs an error check somewhere. IDK where.
         
         // Crop the image
         list($x1, $y1, $x2, $y2) = $this->mask->get_bounding_box();
-        $image2 = imagecreatetruecolor(abs($x2 - $x1), abs($y2 - $y1));
-
-        //Set the flag to save full alpha channel information (as opposed to single-color transparency) when saving PNG images
-        imagesavealpha($image2, true);
-        //behaves identically to imagecolorallocate() with the addition of the transparency parameter alpha
-        $trans_colour = imagecolorallocatealpha($image2, $this->imagecolor[0],$this->imagecolor[1], $this->imagecolor[2], $this->imagecolor[3]);
-        imagefill($image2, 0, 0, $trans_colour);
-
-        imagecopy($image2 ,$this->image, 0, 0, $x1, $y1, abs($x2 - $x1), abs($y2 - $y1));
         
-        imagedestroy($this->image);
-        $this->image = $image2;
-
-        // Adjust the map to the cropped image
-        $this->mask->adjust(-$x1, -$y1);
-        
-        foreach($boxes = $this->get_image_map() as $map) 
+        if($x1 > 0 && $y1 > 0)
         {
-            $res['words'][$map[0]]['box'] = $map[1];
-        }
+            $image2 = imagecreatetruecolor(abs($x2 - $x1), abs($y2 - $y1));
 
-        $res['adjust'] = array('dx' => -$x1, 'dy' => -$y1);
+            //Set the flag to save full alpha channel information (as opposed to single-color transparency) when saving PNG images
+            imagesavealpha($image2, true);
+            //behaves identically to imagecolorallocate() with the addition of the transparency parameter alpha
+            $trans_colour = imagecolorallocatealpha($image2, $this->imagecolor[0],$this->imagecolor[1], $this->imagecolor[2], $this->imagecolor[3]);
+            imagefill($image2, 0, 0, $trans_colour);
+
+            if(imagecopy($image2 ,$this->image, 0, 0, $x1, $y1, abs($x2 - $x1), abs($y2 - $y1)))
+            {
+                imagedestroy($this->image);
+                $this->image = $image2;
+                
+                // Adjust the map to the cropped image
+                $this->mask->adjust(-$x1, -$y1);
+            }
+            
+            foreach($boxes = $this->get_image_map() as $map) 
+            {
+                $res['words'][$map[0]]['box'] = $map[1];
+            }
+
+            $res['adjust'] = array('dx' => -$x1, 'dy' => -$y1);
+        }
+        elseif($this->allow_resize && $this->render_count < self::RENDER_LIMIT)
+        {
+            // Start over with a more appropriately-sized canvas, if we're allowed to.
+            $this->width = abs($x2-$x1) + 100*$this->render_count;
+            $this->height = abs($y2-$y1) + 100*$this->render_count;
+            
+            imagedestroy($this->image);
+            $this->image = imagecreatetruecolor($this->width, $this->height);
+            $this->mask = new Mask();
+            $this->render();
+        }
+        
         return $res;
     }
 

@@ -5,11 +5,12 @@ error_reporting(E_ALL);
 require dirname(__FILE__).'/word_cloud.php';
 
 $font = dirname(__FILE__).'/Arial.ttf';
-$width = 600;
-$height = 600;
+$width = 400;
+$height = 400;
 $full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 
 $cloud = new WordCloud($width, $height, $font);
+$cloud->allow_resize();
 $cloud->parse_text($full_text, TRUE, TRUE);
 $cloud->set_palette(Palette::get_random_palette($cloud->get_image()));
 $cloud->set_text_size(10, 60);
