@@ -1,4 +1,14 @@
 <?php
+/**
+ * This file is part of the PHP_Word_Cloud project.
+ * https://github.com/creatorssyn/PHP_Word_Cloud
+ *
+ * @author Daniel Barsotti / dan [at] dreamcraft [dot] ch
+ * @author Brandon Telle <btelle@creators.com>
+ * @license http://creativecommons.org/licenses/by-nc-sa/3.0/
+ *          Creative Commons Attribution-NonCommercial-ShareAlike 3.0
+ */
+ 
 require dirname(__FILE__).'/word_cloud.php';
 
 /* 
