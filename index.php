@@ -1,35 +1,64 @@
 <?php
-ini_set('show_errors', 1);
-error_reporting(E_ALL);
-
 require dirname(__FILE__).'/word_cloud.php';
 
+/* 
+ * Step 1: Create your cloud
+ * Below is the process for creating a word cloud
+ */
+ 
+// Basic image settings
 $font = dirname(__FILE__).'/Arial.ttf';
+$full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 $width = 400;
 $height = 400;
-$full_text = file_get_contents(dirname(__FILE__).'/test/example_text.txt');
 
 $cloud = new WordCloud($width, $height, $font);
+
+// Allow the image to exceed the given width and height if needed
 $cloud->allow_resize();
+
+// Add words to the cloud
 $cloud->parse_text($full_text, TRUE, TRUE);
+
+// Below are optional settings. You could call render() at this point and get the same result.
+// Set a palette option. See palette.php for more choices
 $cloud->set_palette(Palette::get_random_palette($cloud->get_image()));
-$cloud->set_text_size(10, 60);
+
+// Set min and max text size.
+$cloud->set_text_size(16, 72);
+
+// Set the total number of words allowed in the image
 $cloud->set_word_limit(75);
+
+// How often should vertical words appear
 $cloud->set_vertical_frequency(FrequencyTable::WORDS_MAINLY_HORIZONTAL);
+
+// Render the image
 $cloud->render();
+
+
+/*
+ * Step 2: Output the cloud
+ * Below is the process for outputting the cloud image
+ */
+
+// If no argument is passed to output(), it sends the image directly to the browser with a Content-Type of image/png
 //$cloud->output();
 
 
-// Render the cloud in a temporary file, and return its base64-encoded content
-$file = tempnam(getcwd(), 'img');
+// Alternatively, we can store the image to a file
+$file = tempnam(getcwd(), 'cloud');
 $cloud->output($file);
+
+// And get a base-64 rendering of it
 $img64 = base64_encode(file_get_contents($file));
 unlink($file);
-?>
 
+// And create an interactive map using get_image_map()
+?>
 <img usemap="#mymap" src="data:image/png;base64,<?php echo $img64 ?>" border="0"/>
 <map name="mymap">
 <?php foreach($cloud->get_image_map() as $map): ?>
 <area shape="rect" coords="<?php echo $map[1]->get_map_coords() ?>" onclick="alert('You clicked: <?php echo $map[0] ?>');" />
-<?php endforeach ?>
+<?php endforeach; ?>
 </map>
