@@ -101,6 +101,7 @@ class WordCloud
 
     public function render()
     {
+        $this->mask = new Mask();
         $this->render_count++;
     
         //Set the flag to save full alpha channel information (as opposed to single-color transparency) when saving PNG images
@@ -170,13 +171,6 @@ class WordCloud
                 // Adjust the map to the cropped image
                 $this->mask->adjust(-$x1, -$y1);
             }
-            
-            foreach($boxes = $this->get_image_map() as $map) 
-            {
-                $res['words'][$map[0]]['box'] = $map[1];
-            }
-
-            $res['adjust'] = array('dx' => -$x1, 'dy' => -$y1);
         }
         elseif($this->allow_resize && $this->render_count < self::RENDER_LIMIT)
         {
@@ -186,9 +180,15 @@ class WordCloud
             
             imagedestroy($this->image);
             $this->image = imagecreatetruecolor($this->width, $this->height);
-            $this->mask = new Mask();
             $this->render();
         }
+        
+        foreach($boxes = $this->get_image_map() as $map) 
+        {
+            $res['words'][$map[0]]['box'] = $map[1];
+        }
+
+        $res['adjust'] = array('dx' => -$x1, 'dy' => -$y1);
         
         return $res;
     }

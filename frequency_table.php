@@ -84,6 +84,9 @@ class FrequencyTable
         if($cleanup) 
             $word = $this->cleanup_word($word);
             
+        if($word == "")
+            return;
+            
         if(array_key_exists($word, $this->table))
         {
             $this->table[$word]->count += $count;
