@@ -66,9 +66,17 @@ unlink($file);
 
 // And create an interactive map using get_image_map()
 ?>
-<img usemap="#mymap" src="data:image/png;base64,<?php echo $img64 ?>" border="0"/>
-<map name="mymap">
-<?php foreach($cloud->get_image_map() as $map): ?>
-<area shape="rect" coords="<?php echo $map[1]->get_map_coords() ?>" onclick="alert('You clicked: <?php echo $map[0] ?>');" />
-<?php endforeach; ?>
-</map>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PHP_Word_Cloud</title>
+</head>
+<body>
+    <img usemap="#mymap" src="data:image/png;base64,<?php echo $img64 ?>" border="0"/>
+    <map name="mymap">
+    <?php foreach($cloud->get_image_map() as $map): ?>
+    <area shape="rect" coords="<?php echo $map[1]->get_map_coords() ?>" onclick="alert('You clicked: <?php echo $map[0] ?>');" />
+    <?php endforeach; ?>
+    </map>
+</body>
+</html>
