@@ -168,10 +168,10 @@ class FrequencyTable
      */
     private function cleanup_word($word)
     {
-        $tmp = $word;
-
+        $tmp = self::remove_utf8_bom(mb_convert_encoding(trim($word), 'UTF-8', mb_detect_encoding($word)));
+            
         // Remove unwanted characters
-        $punctuation = array('?', '!', '\'', '"');
+        $punctuation = array('?', '!', '"');
         
         foreach($punctuation as $p)
           $tmp = str_replace($p, '', $tmp);
@@ -235,5 +235,16 @@ class FrequencyTable
     public function get_padding_size()
     {
         return $this->padding_size;
+    }
+    
+    /**
+     * Remove UTF-8 BOM by jasonhao
+     * https://stackoverflow.com/a/15423899
+     */
+    public static function remove_utf8_bom($text)
+    {
+        $bom = pack('H*','EFBBBF');
+        $text = preg_replace("/^$bom/", '', $text);
+        return $text;
     }
 }
